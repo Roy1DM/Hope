@@ -1,339 +1,1012 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Catálogo — Muebles Mónaco</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .catalogo-page {
-      padding: 8rem 5vw 5rem;
-      background: var(--gray50);
-    }
-    .catalogo-page-header {
-      margin-bottom: 3.5rem;
-    }
-    .productos-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-    }
-    .prod-item {
-      background: var(--white);
-      overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .prod-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-    }
-    .prod-item img {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.5s;
-    }
-    .prod-item:hover img {
-      transform: scale(1.04);
-    }
-    .prod-item-info {
-      padding: 1.2rem 1.4rem 1.4rem;
-      border-top: 2px solid var(--g100);
-    }
-    .prod-item-name {
-      font-family: var(--font-display);
-      font-size: 1.15rem;
-      font-weight: 400;
-      color: var(--black);
-    }
-    .prod-item-sub {
-      font-size: 0.75rem;
-      color: var(--gray400);
-      letter-spacing: 0.08em;
-      margin-top: 0.2rem;
-    }
-    @media (max-width: 900px) {
-      .productos-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 500px) {
-      .productos-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Catálogo — Muebles Mónaco</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g900: #0f2318;
+    --g800: #1a3a28;
+    --g700: #1f4d32;
+    --g600: #2d6642;
+    --g500: #3a7d52;
+    --g400: #5a9e72;
+    --g200: #b4d4be;
+    --g100: #e4f0e8;
+    --g050: #f4f9f5;
+    --gray50: #f7f7f6;
+    --gray100: #efefed;
+    --gray200: #dedcda;
+    --gray400: #a0a09e;
+    --gray600: #5c5c5a;
+    --gray800: #2a2a28;
+    --white: #ffffff;
+    --black: #111110;
+    --wa: #25D366;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Jost', sans-serif;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--font-body);
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  img { display: block; max-width: 100%; }
+  a { text-decoration: none; color: inherit; }
+
+  /* CURSOR */
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--g600);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s var(--ease), height 0.25s var(--ease), background 0.25s;
+  }
+  .cursor.grow { width: 40px; height: 40px; background: rgba(42,102,66,0.15); }
+  @media (hover: none) { .cursor { display: none; } }
+
+  /* NAV */
+  nav#navbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.9rem 5vw;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 var(--gray200);
+  }
+  .nav-logo-text {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--g800);
+    letter-spacing: 0.02em;
+  }
+  .nav-links { display: flex; gap: 3rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.76rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray600);
+    transition: color 0.25s;
+    position: relative;
+  }
+  .nav-links a.active { color: var(--g700); }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--g500);
+    transition: width 0.3s var(--ease);
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--g600); }
+  .nav-links a.active::after, .nav-links a:hover::after { width: 100%; }
+
+  /* HEADER del catálogo */
+  .cat-header {
+    padding: 9rem 5vw 3rem;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray100);
+  }
+  .cat-header-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 3rem; flex-wrap: wrap;
+  }
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--g600);
+    margin-bottom: 1.2rem;
+  }
+  .section-tag::before { content: ''; width: 22px; height: 1px; background: var(--g600); }
+  .section-h {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .section-h em { font-style: italic; color: var(--g700); }
+  .cat-sub { color: var(--gray600); font-size: 0.95rem; margin-top: 0.8rem; max-width: 420px; }
+  .cat-meta {
+    display: flex; gap: 2.8rem;
+    border-left: 1px solid var(--gray200);
+    padding-left: 2.8rem;
+  }
+  .cat-meta-item .n {
+    font-family: var(--font-display);
+    font-size: 2rem; font-weight: 500; color: var(--g700);
+    line-height: 1;
+  }
+  .cat-meta-item .l {
+    font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--gray400); margin-top: 0.4rem;
+  }
+
+  /* TOOLBAR */
+  .toolbar-wrap { background: var(--gray50); border-bottom: 1px solid var(--gray100); position: sticky; top: 64px; z-index: 100; }
+  .toolbar {
+    max-width: 1400px; margin: 0 auto;
+    padding: 1.1rem 5vw;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1.5rem; flex-wrap: wrap;
+  }
+  .series-filters {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+  }
+  .chip-btn {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    border: 1px solid var(--gray200);
+    border-radius: 100px;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gray600);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 400;
+  }
+  .chip-btn:hover { border-color: var(--g500); color: var(--g700); }
+  .chip-btn.active {
+    background: var(--g700); border-color: var(--g700); color: var(--white);
+  }
+  .toolbar-right { display: flex; gap: 0.8rem; align-items: center; }
+  .search-box {
+    position: relative; width: 240px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 0.65rem 1rem 0.65rem 2.4rem;
+    border: 1px solid var(--gray200);
+    background: var(--white);
+    border-radius: 100px;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--gray800);
+    outline: none;
+    font-weight: 300;
+  }
+  .search-box input:focus { border-color: var(--g500); }
+  .search-box svg { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--gray400); }
+  .view-toggle { display: flex; background: var(--white); border: 1px solid var(--gray200); border-radius: 100px; padding: 3px; }
+  .view-toggle button {
+    padding: 0.35rem 0.6rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 100px;
+    color: var(--gray400);
+    display: grid; place-items: center;
+  }
+  .view-toggle button.active { background: var(--g700); color: var(--white); }
+
+  .results-row {
+    max-width: 1400px; margin: 0 auto;
+    padding: 1.2rem 5vw 0.4rem;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gray400);
+  }
+  .results-row b { color: var(--g700); font-weight: 500; }
+
+  /* GRID */
+  .cat-page {
+    max-width: 1400px; margin: 0 auto;
+    padding: 1rem 5vw 7rem;
+  }
+  .grid-standard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .grid-editorial {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.5rem;
+  }
+  .grid-editorial .prod { grid-column: span 2; }
+  .grid-editorial .prod:nth-child(9n+1) { grid-column: span 3; }
+  .grid-editorial .prod:nth-child(9n+1) .prod-img { aspect-ratio: 16/11; }
+  .grid-editorial .prod:nth-child(9n+6) { grid-column: span 3; }
+  .grid-editorial .prod:nth-child(9n+6) .prod-img { aspect-ratio: 16/11; }
+  .grid-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  /* PRODUCT CARD */
+  .prod {
+    background: var(--white);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    cursor: pointer;
+  }
+  .prod:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(15, 35, 24, 0.12); }
+  .prod-img {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: var(--gray100);
+  }
+  .prod-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s var(--ease);
+  }
+  .prod:hover .prod-img img { transform: scale(1.06); }
+  .prod-img-fallback {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--gray100), var(--g100));
+    display: grid; place-items: center;
+    color: var(--gray400);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.6rem;
+  }
+  .prod-code-tag {
+    position: absolute;
+    bottom: 1rem; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+    padding: 0.4rem 1rem;
+    border: 1px solid rgba(15,35,24,0.1);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--g800);
+    font-weight: 400;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .prod:hover .prod-code-tag { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  .prod-hover-wa {
+    position: absolute;
+    left: 1rem; right: 1rem; bottom: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--g700);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.3s var(--ease);
+    font-weight: 500;
+  }
+  .prod-hover-wa:hover { background: var(--g800); }
+  .prod:hover .prod-hover-wa { opacity: 1; transform: none; }
+  .prod-hover-wa svg { width: 14px; height: 14px; }
+
+  .prod-info {
+    padding: 1.2rem 1.4rem 1.4rem;
+    border-top: 2px solid var(--g100);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem;
+  }
+  .prod-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--black); }
+  .prod-sub { font-size: 0.7rem; letter-spacing: 0.14em; color: var(--gray400); margin-top: 0.2rem; text-transform: uppercase;}
+  .prod-fav {
+    width: 32px; height: 32px;
+    border: 1px solid var(--gray200);
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: grid; place-items: center;
+    color: var(--gray400);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .prod-fav:hover { border-color: var(--g500); color: var(--g600); }
+  .prod-fav.active { background: var(--g700); color: white; border-color: var(--g700); }
+
+  /* LIST VARIANT */
+  .grid-list .prod {
+    display: grid;
+    grid-template-columns: 180px 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    padding: 0;
+    border: 1px solid var(--gray100);
+  }
+  .grid-list .prod-img { aspect-ratio: 4/3; }
+  .grid-list .prod-info { border-top: none; flex: 1; padding: 1.5rem 0; }
+  .grid-list .prod-hover-wa {
+    position: static; opacity: 1; transform: none;
+    margin-right: 1.5rem;
+    padding: 0.7rem 1.2rem;
+  }
+  .grid-list .prod-code-tag { display: none; }
+  .grid-list .prod:hover { transform: none; box-shadow: 0 8px 24px rgba(15,35,24,0.08); }
+  .grid-list .prod:hover .prod-img img { transform: none; }
+
+  /* EMPTY */
+  .empty {
+    padding: 5rem 2rem;
+    text-align: center;
+    color: var(--gray400);
+    grid-column: 1 / -1;
+  }
+  .empty h3 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--g800);
+    margin-bottom: 0.6rem;
+    font-weight: 400;
+  }
+
+  /* WHATSAPP FLOTANTE */
+  .wa-float {
+    position: fixed; bottom: 1.8rem; right: 1.8rem;
+    z-index: 400;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 0.9rem;
+  }
+  .wa-bubble {
+    background: var(--white);
+    border: 1px solid var(--g100);
+    padding: 1rem 1.1rem 1.1rem 1.2rem;
+    max-width: 280px;
+    box-shadow: 0 16px 40px rgba(15, 35, 24, 0.14);
+    position: relative;
+    animation: slideIn 0.4s var(--ease-out);
+    border-left: 3px solid var(--g500);
+  }
+  .wa-bubble-label {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--g800);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.01em;
+  }
+  .wa-bubble-txt {
+    font-size: 0.78rem;
+    color: var(--gray600);
+    line-height: 1.6;
+  }
+  .wa-bubble-close {
+    position: absolute; top: 0.4rem; right: 0.6rem;
+    background: none; border: none; cursor: pointer;
+    font-size: 1.2rem; color: var(--gray400);
+    line-height: 1;
+  }
+  .wa-btn {
+    width: 58px; height: 58px;
+    background: var(--g700);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: grid; place-items: center;
+    box-shadow: 0 8px 24px rgba(15, 35, 24, 0.35);
+    position: relative;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .wa-btn:hover { transform: scale(1.06); background: var(--g800); }
+  .wa-btn::before {
+    content: ''; position: absolute; inset: -4px;
+    border: 2px solid var(--g500); border-radius: 50%;
+    opacity: 0.5;
+    animation: pulse 2.2s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* LIGHTBOX */
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(10, 20, 14, 0.92);
+    backdrop-filter: blur(6px);
+    z-index: 600;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 5vh 4vw;
+    animation: fadeIn 0.25s var(--ease-out);
+  }
+  .lightbox.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .lb-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lb-img-wrap {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lb-img {
+    max-width: 100%;
+    max-height: 78vh;
+    object-fit: contain;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: zoomIn 0.35s var(--ease-out);
+  }
+  @keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .lb-info {
+    position: absolute;
+    bottom: -5.5rem; left: 0; right: 0;
+    text-align: center;
+    color: white;
+  }
+  .lb-info .lb-name {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+  .lb-info .lb-code {
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--g200);
+    margin-bottom: 1rem;
+  }
+  .lb-info .lb-wa {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    padding: 0.85rem 1.8rem;
+    background: var(--g600);
+    color: white;
+    font-family: var(--font-body);
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid var(--g500);
+    transition: background 0.2s;
+  }
+  .lb-info .lb-wa:hover { background: var(--g700); }
+
+  .lb-close, .lb-arrow {
+    position: absolute;
+    width: 48px; height: 48px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.35);
+    color: white;
+    cursor: pointer;
+    display: grid; place-items: center;
+    transition: all 0.2s;
+    border-radius: 50%;
+  }
+  .lb-close:hover, .lb-arrow:hover {
+    background: var(--g700);
+    border-color: var(--g500);
+  }
+  .lb-close {
+    top: 2vh; right: 2vw;
+    z-index: 2;
+  }
+  .lb-arrow { top: 50%; transform: translateY(-50%); }
+  .lb-arrow.prev { left: 1vw; }
+  .lb-arrow.next { right: 1vw; }
+
+  .lb-counter {
+    position: absolute;
+    top: 2vh; left: 2vw;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 700px) {
+    .lb-img { max-height: 60vh; }
+    .lb-info { bottom: -4.5rem; }
+    .lb-info .lb-name { font-size: 1.3rem; }
+    .lb-arrow { width: 38px; height: 38px; }
+  }
+
+  /* TWEAKS */
+  .tweaks {
+    position: fixed; top: 5.5rem; right: 1.5rem;
+    background: var(--white);
+    border: 1px solid var(--gray200);
+    padding: 1.2rem;
+    width: 280px;
+    z-index: 450;
+    box-shadow: 0 16px 40px rgba(15,35,24,0.12);
+    display: none;
+  }
+  .tweaks.open { display: block; }
+  .tweaks h4 {
+    font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--g700); margin-bottom: 1rem;
+    font-weight: 500;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--g100);
+  }
+  .tweak-row { margin-bottom: 1rem; }
+  .tweak-row label {
+    display: block; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--gray600); margin-bottom: 0.5rem;
+  }
+  .tweak-opts { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .tweak-opts button {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--gray200);
+    background: var(--white);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    cursor: pointer;
+    color: var(--gray600);
+  }
+  .tweak-opts button.active { background: var(--g700); color: white; border-color: var(--g700); }
+  .tweak-opts .swatch {
+    width: 30px; height: 30px; padding: 0;
+    border-radius: 50%;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    padding: 2.2rem 5vw;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .foot-logo-txt { font-family: var(--font-display); font-size: 1rem; color: rgba(255,255,255,0.7); font-weight: 500; }
+  .foot-copy { font-size: 0.7rem; letter-spacing: 0.06em; color: rgba(255,255,255,0.3); }
+  .foot-social { display: flex; gap: 1rem; }
+  .foot-social a { opacity: 0.5; transition: opacity 0.2s; }
+  .foot-social a:hover { opacity: 1; }
+
+  /* REVEAL */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out); }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1000px) {
+    .grid-standard { grid-template-columns: repeat(2, 1fr); }
+    .grid-editorial { grid-template-columns: repeat(2, 1fr); }
+    .grid-editorial .prod, .grid-editorial .prod:nth-child(9n+1), .grid-editorial .prod:nth-child(9n+6) { grid-column: span 1; }
+    .grid-editorial .prod:nth-child(9n+1) .prod-img, .grid-editorial .prod:nth-child(9n+6) .prod-img { aspect-ratio: 4/3; }
+    .cat-meta { padding-left: 0; border-left: none; }
+  }
+  @media (max-width: 640px) {
+    .grid-standard { grid-template-columns: 1fr; }
+    .grid-editorial { grid-template-columns: 1fr; }
+    .grid-list .prod { grid-template-columns: 1fr; gap: 0; }
+    .grid-list .prod-img { aspect-ratio: 4/3; }
+    .grid-list .prod-info { padding: 1rem 1.4rem 0; }
+    .grid-list .prod-hover-wa { margin: 1rem 1.4rem 1.4rem; }
+    .nav-links { gap: 1.4rem; }
+    .nav-links a { font-size: 0.68rem; letter-spacing: 0.1em; }
+    .search-box { width: 100%; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar-right { justify-content: space-between; }
+  }
+</style>
 </head>
 <body>
 
-  <nav id="navbar" class="scrolled">
-    <a href="index.html" class="nav-logo">
-      <img src="1776305229606_image.png" alt="Muebles Mónaco"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
-      <span class="nav-logo-text" style="display:none">Muebles Mónaco</span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.html">Inicio</a></li>
-      <li><a href="catalogo.html">Catálogo</a></li>
-      <li><a href="contacto.html">Contáctanos</a></li>
-    </ul>
-  </nav>
+<div class="cursor" id="cursor"></div>
 
-  <div class="catalogo-page">
-    <div class="catalogo-page-header reveal">
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">Muebles Mónaco</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="catalogo.html" class="active">Catálogo</a></li>
+    <li><a href="contacto.html">Contáctanos</a></li>
+  </ul>
+</nav>
+
+<header class="cat-header">
+  <div class="cat-header-inner">
+    <div class="reveal">
       <p class="section-tag">Colección 2026</p>
       <h1 class="section-h">Catálogo <em>Mónaco</em></h1>
-      <p style="color:var(--gray600); margin-top:0.8rem; font-size:0.95rem;">
-        Somos parte de tu hogar.
-      </p>
+      <p class="cat-sub">Somos parte de tu hogar.</p>
     </div>
-
-    <div class="productos-grid">
-
-      <div class="prod-item reveal">
-        <img src="img/Adela 3CHT.jpeg" alt="Adela 3CHT"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Adela</div>
-          <div class="prod-item-sub">3CHT</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Alton 32.jpeg" alt="Alton 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Alton</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Anya 32.jpeg" alt="Anya 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Anya</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Austria 321.jpeg" alt="Austria 321"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Austria</div>
-          <div class="prod-item-sub">321</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Blue 312.jpeg" alt="Blue 312"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Blue</div>
-          <div class="prod-item-sub">312</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Brigitte 32.jpeg" alt="Brigitte 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Brigitte</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Charlotte-321.jpeg" alt="Charlotte 321"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Charlotte</div>
-          <div class="prod-item-sub">321</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Daniela 32.jpeg" alt="Daniela 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Daniela</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Fabiana 32.jpeg" alt="Fabiana 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Fabiana</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Faryl 22E.jpeg" alt="Faryl 22E"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Faryl</div>
-          <div class="prod-item-sub">22E</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Hamilton-21-CHT.jpeg" alt="Hamilton 21-C HT"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Hamilton</div>
-          <div class="prod-item-sub">21-C HT</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Jordyn 32 CHT.jpeg" alt="Jordyn 32 CHT"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Jordyn</div>
-          <div class="prod-item-sub">32 CHT</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Julie 321.jpeg" alt="Julie 321"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Julie</div>
-          <div class="prod-item-sub">321</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Katina 7 piezas.jpeg" alt="Katina 7 piezas"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Katina</div>
-          <div class="prod-item-sub">7 piezas</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Leslie-2ch.jpeg" alt="Leslie 2ch"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Leslie</div>
-          <div class="prod-item-sub">2ch</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Merida 312.jpeg" alt="Merida 312"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Mérida</div>
-          <div class="prod-item-sub">312</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Mónaco 321.jpeg" alt="Mónaco 321"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Mónaco</div>
-          <div class="prod-item-sub">321</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Natalia 2B.jpeg" alt="Natalia 28"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Natalia</div>
-          <div class="prod-item-sub">28</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Nora 32.jpeg" alt="Nora 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Nora</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Nuria 32.jpeg" alt="Nuria 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Nuria</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Paris 32.jpeg" alt="Paris 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Paris</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Peralta 321.jpeg" alt="Peralta 321"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Peralta</div>
-          <div class="prod-item-sub">321</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Selene 32.jpeg" alt="Selene 32"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Selene</div>
-          <div class="prod-item-sub">32</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal">
-        <img src="img/Sky 321.jpeg" alt="Sky 321"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Sky</div>
-          <div class="prod-item-sub">321</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d1">
-        <img src="img/Stella 3CH.jpeg" alt="Stella 3CH"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Stella</div>
-          <div class="prod-item-sub">3CH</div>
-        </div>
-      </div>
-
-      <div class="prod-item reveal d2">
-        <img src="img/Victoria 33.jpeg" alt="Victoria 33"/>
-        <div class="prod-item-info">
-          <div class="prod-item-name">Victoria</div>
-          <div class="prod-item-sub">33</div>
-        </div>
-      </div>
-
+    <div class="cat-meta reveal">
+      <div class="cat-meta-item"><div class="n" id="metaTotal">
+</div><div class="l">
+</div></div>
+      <div class="cat-meta-item"><div class="n">
+</div><div class="l">
+</div></div>
+      <div class="cat-meta-item"><div class="n">Envíos a todo México</div><div class="l">
+</div></div>
     </div>
   </div>
+</header>
 
-  <footer>
-    <div class="foot-logo">
-      <img src="1776305229606_image.png" alt="Muebles Mónaco"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
-      <span class="foot-logo-txt" style="display:none">Muebles Mónaco</span>
+<div class="toolbar-wrap">
+  <div class="toolbar">
+    <div class="series-filters" id="seriesFilters"></div>
+    <div class="toolbar-right">
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre…">
+      </div>
+      <div class="view-toggle" id="viewToggle">
+        <button data-view="standard" class="active" aria-label="Grilla">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <button data-view="editorial" aria-label="Editorial">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="11" height="7"/><rect x="16" y="3" width="5" height="7"/><rect x="3" y="14" width="5" height="7"/><rect x="10" y="14" width="11" height="7"/></svg>
+        </button>
+        <button data-view="list" aria-label="Lista">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+        </button>
+      </div>
     </div>
-    <div class="foot-social">
-      <a href="https://facebook.com/mueblesmonaco" target="_blank">
-        <svg viewBox="0 0 24 24" width="20" fill="white" opacity="0.5">
-          <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-        </svg>
-      </a>
-      <a href="https://instagram.com/mueblesmonaco" target="_blank">
-        <svg viewBox="0 0 24 24" width="20" fill="none" stroke="white" stroke-width="1.5" opacity="0.5">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <circle cx="12" cy="12" r="4"/>
-          <circle cx="17.5" cy="6.5" r="0.5" fill="white"/>
-        </svg>
-      </a>
-    </div>
-    <p class="foot-copy">© 2025 Muebles Mónaco · 60 años de tradición · Todos los derechos reservados</p>
-  </footer>
+  </div>
+</div>
 
-  <script>
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 60);
+<div class="results-row">Mostrando <b id="resultCount">—</b></div>
+
+<main class="cat-page">
+  <div id="productsContainer" class="grid-standard"></div>
+</main>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <div class="lb-counter" id="lbCounter">1 / 26</div>
+  <button class="lb-close" id="lbClose" aria-label="Cerrar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
+  <button class="lb-arrow prev" id="lbPrev" aria-label="Anterior">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="lb-arrow next" id="lbNext" aria-label="Siguiente">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="lb-stage">
+    <div class="lb-img-wrap">
+      <img class="lb-img" id="lbImg" src="" alt="">
+      <div class="lb-info">
+        <div class="lb-name" id="lbName"></div>
+        <div class="lb-code" id="lbCode"></div>
+        <a class="lb-wa" id="lbWa" href="#" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Consultar por WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WhatsApp flotante -->
+<div class="wa-float">
+  <div class="wa-bubble" id="waBubble">
+    <button class="wa-bubble-close" id="waBubbleClose" aria-label="Cerrar">×</button>
+    <div class="wa-bubble-label">¿Te ayudamos a elegir?</div>
+    <div class="wa-bubble-txt">Escríbenos por WhatsApp y un asesor te atiende al momento.</div>
+  </div>
+  <button class="wa-btn" id="waBtn" aria-label="Contactar por WhatsApp">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Tweaks -->
+<div class="tweaks" id="tweaksPanel">
+  <h4>Tweaks</h4>
+  <div class="tweak-row">
+    <label>Vista del catálogo</label>
+    <div class="tweak-opts" id="tweakView">
+      <button data-v="standard" class="active">Grilla</button>
+      <button data-v="editorial">Editorial</button>
+      <button data-v="list">Lista</button>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <label>Burbuja de bienvenida</label>
+    <div class="tweak-opts" id="tweakBubble">
+      <button data-v="on" class="active">Mostrar</button>
+      <button data-v="off">Ocultar</button>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <label>Etiqueta de código en foto</label>
+    <div class="tweak-opts" id="tweakTag">
+      <button data-v="on" class="active">Mostrar</button>
+      <button data-v="off">Ocultar</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="foot-logo-txt">Muebles Mónaco</span>
+  <div class="foot-social">
+    <a href="https://www.facebook.com/people/The-Aztec-Furniture/100095145165858/" target="_blank" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" width="18" fill="white"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/aztec.furtniture?igsh=MTFlYXo5NHBuaTRqOQ%3D%3D&utm_source=qr" target="_blank" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" width="18" fill="none" stroke="white" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="white"/></svg>
+    </a>
+  </div>
+  <p class="foot-copy">© 2026 Muebles Mónaco · 60 años de tradición · Todos los derechos reservados</p>
+</footer>
+
+<script>
+  // ==== DATA ====
+  const IMG_BASE = 'https://roy1dm.github.io/Hope/img/';
+  const PRODUCTS = [
+    { name: 'Adela',     code: '3CHT',       img: 'Adela 3CHT.jpeg' },
+    { name: 'Alton',     code: '32',         img: 'Alton 32.jpeg' },
+    { name: 'Anya',      code: '32',         img: 'Anya 32.jpeg' },
+    { name: 'Austria',   code: '321',        img: 'Austria 321.jpeg' },
+    { name: 'Blue',      code: '312',        img: 'Blue 312.jpeg' },
+    { name: 'Brigitte',  code: '32',         img: 'Brigitte 32.jpeg' },
+    { name: 'Charlotte', code: '321',        img: 'Charlotte-321.jpeg' },
+    { name: 'Daniela',   code: '32',         img: 'Daniela 32.jpeg' },
+    { name: 'Fabiana',   code: '32',         img: 'Fabiana 32.jpeg' },
+    { name: 'Faryl',     code: '22E',        img: 'Faryl 22E.jpeg' },
+    { name: 'Hamilton',  code: '21-C HT',    img: 'Hamilton-21-CHT.jpeg' },
+    { name: 'Jordyn',    code: '32 CHT',     img: 'Jordyn 32 CHT.jpeg' },
+    { name: 'Julie',     code: '321',        img: 'Julie 321.jpeg' },
+    { name: 'Katina',    code: '7 piezas',   img: 'Katina 7 piezas.jpeg' },
+    { name: 'Leslie',    code: '2CH',        img: 'Leslie-2ch.jpeg' },
+    { name: 'Mérida',    code: '312',        img: 'Merida 312.jpeg' },
+    { name: 'Mónaco',    code: '321',        img: 'Mónaco 321.jpeg' },
+    { name: 'Natalia',   code: '2B',         img: 'Natalia 2B.jpeg' },
+    { name: 'Nora',      code: '32',         img: 'Nora 32.jpeg' },
+    { name: 'Nuria',     code: '32',         img: 'Nuria 32.jpeg' },
+    { name: 'Paris',     code: '32',         img: 'Paris 32.jpeg' },
+    { name: 'Peralta',   code: '321',        img: 'Peralta 321.jpeg' },
+    { name: 'Selene',    code: '32',         img: 'Selene 32.jpeg' },
+    { name: 'Sky',       code: '321',        img: 'Sky 321.jpeg' },
+    { name: 'Stella',    code: '3CH',        img: 'Stella 3CH.jpeg' },
+    { name: 'Victoria',  code: '33',         img: 'Victoria 33.jpeg' },
+  ];
+
+  // Clasificamos por "serie" según el código
+  function classify(p) {
+    const c = p.code.toUpperCase();
+    if (/3\s*CHT|3CH|CHT/.test(c)) return 'Esquinero CHT';
+    if (c.includes('321') || c.includes('312')) return 'Sala 3-2-1';
+    if (/^32(\s|$)|^32B/.test(c) || c === '32') return 'Sala 3-2';
+    if (c.includes('22') || c.includes('2B') || c.includes('2CH')) return 'Sala 2-piezas';
+    if (c.includes('21')) return 'Sala 2-1';
+    if (c.includes('PIEZAS') || /\d+\s*PIEZAS/.test(c)) return 'Especial';
+    if (c === '33') return 'Sala 3-3';
+    return 'Otros';
+  }
+  PRODUCTS.forEach(p => p.serie = classify(p));
+
+  // ==== STATE ====
+  const WA_NUMBER = '525550762077';
+  const waLink = (msg) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+
+  const state = {
+    serie: 'Todas',
+    search: '',
+    view: 'standard',
+    favorites: new Set(JSON.parse(localStorage.getItem('monaco_favs') || '[]')),
+    cardWA: 'hover',
+    showTag: 'on',
+  };
+
+  // ==== SERIES FILTERS ====
+  const allSeries = ['Todas', ...new Set(PRODUCTS.map(p => p.serie))];
+  const seriesBox = document.getElementById('seriesFilters');
+  allSeries.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'chip-btn' + (s === 'Todas' ? ' active' : '');
+    btn.textContent = s;
+    btn.dataset.serie = s;
+    btn.addEventListener('click', () => {
+      state.serie = s;
+      document.querySelectorAll('#seriesFilters .chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
     });
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-  </script>
+    seriesBox.appendChild(btn);
+  });
 
+  // ==== SEARCH ====
+  document.getElementById('searchInput').addEventListener('input', e => {
+    state.search = e.target.value.toLowerCase();
+    render();
+  });
+
+  // ==== VIEW TOGGLE ====
+  function setView(v) {
+    state.view = v;
+    document.querySelectorAll('#viewToggle button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+    document.querySelectorAll('#tweakView button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+    render();
+  }
+  document.getElementById('viewToggle').addEventListener('click', e => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    setView(btn.dataset.view);
+  });
+
+  // ==== FILTER ====
+  function filtered() {
+    return PRODUCTS.filter(p => {
+      if (state.serie !== 'Todas' && p.serie !== state.serie) return false;
+      if (state.search) {
+        const q = state.search;
+        return p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q);
+      }
+      return true;
+    });
+  }
+
+  // ==== RENDER ====
+  const container = document.getElementById('productsContainer');
+
+  function cardHTML(p) {
+    const imgUrl = IMG_BASE + encodeURIComponent(p.img);
+    return `
+      <article class="prod" data-id="${p.name}-${p.code}">
+        <div class="prod-img">
+          <div class="prod-img-fallback">${p.name}</div>
+          <img src="${imgUrl}" alt="${p.name} ${p.code}" loading="lazy" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
+          ${state.showTag === 'on' ? `<div class="prod-code-tag">${p.name} ${p.code}</div>` : ''}
+        </div>
+        <div class="prod-info">
+          <div>
+            <div class="prod-name">${p.name}</div>
+            <div class="prod-sub">${p.code} · ${p.serie}</div>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function render() {
+    const list = filtered();
+    document.getElementById('resultCount').textContent = `${list.length} de ${PRODUCTS.length} modelos` + (state.serie !== 'Todas' ? ` · ${state.serie}` : '');
+    // metaTotal intentionally blank
+    container.className = 'grid-' + state.view;
+    if (list.length === 0) {
+      container.innerHTML = `<div class="empty"><h3>No encontramos modelos</h3><p>Prueba con otra búsqueda o cambia el filtro.</p></div>`;
+      return;
+    }
+    container.innerHTML = list.map(cardHTML).join('');
+    // Product click -> open lightbox
+    container.querySelectorAll('.prod').forEach((el, idx) => {
+      el.addEventListener('click', () => openLightbox(filtered(), idx));
+    });
+  }
+
+  // ==== LIGHTBOX ====
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbName = document.getElementById('lbName');
+  const lbCode = document.getElementById('lbCode');
+  const lbWa = document.getElementById('lbWa');
+  const lbCounter = document.getElementById('lbCounter');
+  let lbItems = [];
+  let lbIndex = 0;
+
+  function openLightbox(items, index) {
+    lbItems = items; lbIndex = index;
+    showLightboxItem();
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function showLightboxItem() {
+    const p = lbItems[lbIndex]; if (!p) return;
+    lbImg.src = IMG_BASE + encodeURIComponent(p.img);
+    lbImg.alt = `${p.name} ${p.code}`;
+    lbName.textContent = p.name;
+    lbCode.textContent = `${p.code} · ${p.serie}`;
+    lbCounter.textContent = `${lbIndex + 1} / ${lbItems.length}`;
+    const msg = `Hola, vengo de su página web y me interesa la sala "${p.name} ${p.code}". ¿Me das más información, precio y disponibilidad?`;
+    lbWa.href = waLink(msg);
+    // retrigger zoom animation
+    lbImg.style.animation = 'none'; void lbImg.offsetWidth; lbImg.style.animation = '';
+  }
+  function lbNext() { lbIndex = (lbIndex + 1) % lbItems.length; showLightboxItem(); }
+  function lbPrev() { lbIndex = (lbIndex - 1 + lbItems.length) % lbItems.length; showLightboxItem(); }
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbNext').addEventListener('click', lbNext);
+  document.getElementById('lbPrev').addEventListener('click', lbPrev);
+  lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('lb-stage') || e.target.classList.contains('lb-img-wrap')) closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') lbNext();
+    if (e.key === 'ArrowLeft') lbPrev();
+  });
+
+  // ==== WhatsApp Flotante ====
+  const waBubble = document.getElementById('waBubble');
+  document.getElementById('waBtn').addEventListener('click', () => {
+    window.open(waLink('Hola, estoy viendo su catálogo en la web y me gustaría más información.'), '_blank');
+  });
+  document.getElementById('waBubbleClose').addEventListener('click', () => { waBubble.style.display = 'none'; });
+
+  // ==== TWEAKS ====
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "view": "standard",
+    "bubble": "on",
+    "showTag": "on"
+  }/*EDITMODE-END*/;
+  const tweaks = { ...TWEAK_DEFAULTS };
+
+  window.addEventListener('message', e => {
+    if (!e.data) return;
+    if (e.data.type === '__activate_edit_mode') document.getElementById('tweaksPanel').classList.add('open');
+    if (e.data.type === '__deactivate_edit_mode') document.getElementById('tweaksPanel').classList.remove('open');
+  });
+  window.parent.postMessage({type: '__edit_mode_available'}, '*');
+
+  function wireTweak(id, key, onChange) {
+    document.querySelectorAll(`#${id} button`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll(`#${id} button`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const val = btn.dataset.v;
+        tweaks[key] = val;
+        onChange(val);
+        window.parent.postMessage({type:'__edit_mode_set_keys', edits: {[key]: val}}, '*');
+      });
+    });
+  }
+  wireTweak('tweakView', 'view', v => setView(v));
+  wireTweak('tweakBubble', 'bubble', v => { waBubble.style.display = (v === 'on') ? 'block' : 'none'; });
+  wireTweak('tweakTag', 'showTag', v => { state.showTag = v; render(); });
+
+  function applyTweaks() {
+    state.showTag = tweaks.showTag;
+    waBubble.style.display = tweaks.bubble === 'on' ? 'block' : 'none';
+    setView(tweaks.view);
+  }
+
+  // ==== CURSOR ====
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('a, button, .prod')) cursor.classList.add('grow');
+    else cursor.classList.remove('grow');
+  });
+
+  // ==== REVEAL ====
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // ==== INIT ====
+  applyTweaks();
+</script>
 </body>
 </html>
